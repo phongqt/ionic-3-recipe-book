@@ -17,6 +17,7 @@ import { ShoppingListService } from '../services/shopping-list';
 import { RecipeService } from '../services/recipe';
 import { AuthService } from '../services/auth';
 import { SLOptionsPage } from '../pages/shopping-list/sl-options/sl-options';
+import { HttpModule } from "@angular/http";
 
 @NgModule({
   declarations: [
@@ -32,6 +33,7 @@ import { SLOptionsPage } from '../pages/shopping-list/sl-options/sl-options';
   ],
   imports: [
     BrowserModule,
+    HttpModule,
     IonicModule.forRoot(MyApp)
   ],
   bootstrap: [IonicApp],

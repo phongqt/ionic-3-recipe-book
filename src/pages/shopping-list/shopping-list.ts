@@ -1,4 +1,3 @@
-
 import { Component } from '@angular/core';
 import { IonicPage, PopoverController } from 'ionic-angular';
 import { NgForm } from '@angular/forms';
@@ -6,6 +5,7 @@ import { NgForm } from '@angular/forms';
 import { ShoppingListService } from '../../services/shopping-list';
 import { Ingredient } from '../../model/ingredient';
 import { SLOptionsPage } from './sl-options/sl-options';
+import { AuthService } from '../../services/auth';
 
 @IonicPage()
 @Component({
@@ -16,7 +16,9 @@ export class ShoppingListPage {
   listItems: Ingredient[] = [];
 
   constructor(private slService: ShoppingListService,
-    private popoverCtrl: PopoverController) { }
+    private popoverCtrl: PopoverController,
+    private authService: AuthService
+  ) { }
 
   ionViewWillEnter() {
     this.loadItems();
@@ -41,8 +43,30 @@ export class ShoppingListPage {
     const popover = this.popoverCtrl.create(SLOptionsPage);
     popover.present({ ev: event });
     popover.onDidDismiss(data => {
-      if (data) {
-
+      if (data && data.action) {
+        if (data.action == 'load') {
+          this.authService.getActiveUser().getToken().then((token: string) => {
+            this.slService.fetchList(token).subscribe((list: Ingredient[]) => {
+              if (list) {
+                this.listItems = list;
+              } else {
+                this.listItems = [];
+              }
+            },
+              err => {
+                console.log(err);
+              })
+          });
+        } else {
+          this.authService.getActiveUser().getToken().then((token: string) => {
+            this.slService.storeList(token).subscribe(() => {
+              console.log('Success');
+            },
+              err => {
+                console.log(err);
+              })
+          });
+        }
       }
     });
   }
