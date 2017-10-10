@@ -39,11 +39,15 @@ export class ShoppingListService {
 
   fetchList(token: string) {
     const userId = this.authService.getActiveUser().uid;
-    return this.http.put('https://ionic3-recipe-book-aa3c9.firebaseio.com/' + userId + '/shopping-list.json?auth=' + token, this.ingredients)
+    return this.http.get('https://ionic3-recipe-book-aa3c9.firebaseio.com/' + userId + '/shopping-list.json?auth=' + token, this.ingredients)
       .map((response) => {
         return response.json();
-      }).do((data) => {
-        this.ingredients = data;
+      }).do((data: Ingredient[]) => {
+        if (data) {
+          this.ingredients = data;
+        } else {
+          this.ingredients = [];
+        }
       });
   }
 }

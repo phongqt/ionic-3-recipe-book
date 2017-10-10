@@ -1,11 +1,12 @@
 import { Component } from '@angular/core';
-import { IonicPage, PopoverController } from 'ionic-angular';
+import { IonicPage, PopoverController, LoadingController } from 'ionic-angular';
 import { NgForm } from '@angular/forms';
 
 import { ShoppingListService } from '../../services/shopping-list';
 import { Ingredient } from '../../model/ingredient';
-import { SLOptionsPage } from './sl-options/sl-options';
+import { DatabaseOptionsPage } from '../database-options/database-options';
 import { AuthService } from '../../services/auth';
+import { HandleError } from "../../services/handle-error";
 
 @IonicPage()
 @Component({
@@ -17,7 +18,9 @@ export class ShoppingListPage {
 
   constructor(private slService: ShoppingListService,
     private popoverCtrl: PopoverController,
-    private authService: AuthService
+    private authService: AuthService,
+    private loadingCtrl: LoadingController,
+    private handleError: HandleError
   ) { }
 
   ionViewWillEnter() {
@@ -40,13 +43,19 @@ export class ShoppingListPage {
   }
 
   onShowOptions(event: MouseEvent) {
-    const popover = this.popoverCtrl.create(SLOptionsPage);
+    const loading = this.loadingCtrl.create({
+      content: 'Please wait...'
+    });
+
+    const popover = this.popoverCtrl.create(DatabaseOptionsPage);
     popover.present({ ev: event });
     popover.onDidDismiss(data => {
       if (data && data.action) {
         if (data.action == 'load') {
+          loading.present();
           this.authService.getActiveUser().getToken().then((token: string) => {
             this.slService.fetchList(token).subscribe((list: Ingredient[]) => {
+              loading.dismiss();
               if (list) {
                 this.listItems = list;
               } else {
@@ -54,16 +63,19 @@ export class ShoppingListPage {
               }
             },
               err => {
-                console.log(err);
+                loading.dismiss();
+                this.handleError.onPresent('An error occurred!', err.json().error);
               })
           });
-        } else {
+        } else if (data.action == 'store') {
+          loading.present();
           this.authService.getActiveUser().getToken().then((token: string) => {
             this.slService.storeList(token).subscribe(() => {
-              console.log('Success');
+              loading.dismiss();
             },
               err => {
-                console.log(err);
+                loading.dismiss();
+                this.handleError.onPresent('An error occurred!', err.json().error);
               })
           });
         }

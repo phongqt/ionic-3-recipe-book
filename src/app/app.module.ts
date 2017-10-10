@@ -3,6 +3,7 @@ import { ErrorHandler, NgModule } from '@angular/core';
 import { IonicApp, IonicErrorHandler, IonicModule } from 'ionic-angular';
 import { SplashScreen } from '@ionic-native/splash-screen';
 import { StatusBar } from '@ionic-native/status-bar';
+import { HttpModule } from "@angular/http";
 
 import { MyApp } from './app.component';
 import { EditRecipePage } from '../pages/edit-recipe/edit-recipe';
@@ -16,8 +17,8 @@ import { SigninPage } from './../pages/signin/signin';
 import { ShoppingListService } from '../services/shopping-list';
 import { RecipeService } from '../services/recipe';
 import { AuthService } from '../services/auth';
-import { SLOptionsPage } from '../pages/shopping-list/sl-options/sl-options';
-import { HttpModule } from "@angular/http";
+import { DatabaseOptionsPage } from '../pages/database-options/database-options';
+import { HandleError } from './../services/handle-error';
 
 @NgModule({
   declarations: [
@@ -29,7 +30,7 @@ import { HttpModule } from "@angular/http";
     TabsPage,
     SignupPage,
     SigninPage,
-    SLOptionsPage
+    DatabaseOptionsPage
   ],
   imports: [
     BrowserModule,
@@ -46,7 +47,7 @@ import { HttpModule } from "@angular/http";
     TabsPage,
     SignupPage,
     SigninPage,
-    SLOptionsPage
+    DatabaseOptionsPage
   ],
   providers: [
     StatusBar,
@@ -54,7 +55,8 @@ import { HttpModule } from "@angular/http";
     { provide: ErrorHandler, useClass: IonicErrorHandler },
     ShoppingListService,
     RecipeService,
-    AuthService
+    AuthService,
+    HandleError
   ]
 })
 export class AppModule { }
